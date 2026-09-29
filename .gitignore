@@ -1,0 +1,30 @@
+# Variáveis de ambiente e Chaves de API (CRÍTICO: NUNCA SUBIR AO GITHUB)
+.env
+.env.local
+.env.*
+!.env.example
+
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Ambientes Virtuais
+venv/
+.venv/
+env/
+
+# Perfis temporários de navegador
+perfil_chrome_robo/
+*.png
+*.log
+
+# Backups locais
+*_backup.py
+
+# Arquivos do sistema operacional
+Thumbs.db
+Desktop.ini
+.DS_Store
