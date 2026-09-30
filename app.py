@@ -18,6 +18,8 @@ from datetime import datetime
 from precificador import calcular_custo_impressao, sugerir_preco_venda
 from pesquisador_mercado import minerar_mercado_livre
 from gerador_anuncios import criar_anuncio_com_ia
+from atendimento_ia import responder_duvida_cliente
+
 
 # ---------------------------------------------------------------------------
 # CONFIGURAÇÃO GERAL DA PÁGINA
@@ -240,11 +242,13 @@ with st.sidebar:
 # ---------------------------------------------------------------------------
 # TABS PRINCIPAIS
 # ---------------------------------------------------------------------------
-tab_agente, tab_calculadora, tab_historico = st.tabs([
+tab_agente, tab_calculadora, tab_atendimento, tab_historico = st.tabs([
     "🤖 Agente Autônomo & IA",
     "🧮 Simulador de Margem e Taxas",
+    "💬 Agente de Atendimento & Vendas",
     "📊 Histórico & Planilhas Excel"
 ])
+
 
 
 # ===========================================================================
@@ -440,9 +444,67 @@ with tab_calculadora:
 
 
 # ===========================================================================
-# ABA 3: HISTÓRICO DE PESQUISAS & PLANILHAS
+# ABA 3: AGENTE DE ATENDIMENTO & PRÉ-VENDA COM IA
+# ===========================================================================
+with tab_atendimento:
+    st.markdown("#### 💬 Agente de Atendimento & Respostas de Alta Conversão")
+    st.caption("Responda dúvidas de clientes no Mercado Livre e Shopee em segundos com copywriting profissional e gatilhos de fechamento.")
+
+    c_atend_prod, c_atend_detalhes = st.columns([1.5, 2])
+    with c_atend_prod:
+        prod_atendimento = st.text_input("Produto Relacionado", value="Suporte de Controle PS5 Gamer de Mesa", key="atend_prod")
+    with c_atend_detalhes:
+        detalhes_custom = st.text_input("Detalhes da Peça (Opcional)", placeholder="Ex: Acompanha fita dupla face 3M, disponível em preto e branco...", key="atend_detalhes")
+
+    st.markdown("##### ❓ Dúvida do Cliente no Anúncio:")
+    
+    # Botões rápidos com dúvidas comuns de compradores
+    st.caption("Sugestões rápidas de perguntas frequentes:")
+    col_b1, col_b2, col_b3, col_b4 = st.columns(4)
+    pergunta_padrao = ""
+    if col_b1.button("🎮 Serve com capa/capinha?"):
+        st.session_state["duvida_cliente"] = "Serve no controle com capa de silicone ou fica muito apertado?"
+    if col_b2.button("🚚 Tem pronta entrega / envia hoje?"):
+        st.session_state["duvida_cliente"] = "Tem a pronta entrega na cor preta? Envia no mesmo dia?"
+    if col_b3.button("🎨 Tem outras cores / faz personalizado?"):
+        st.session_state["duvida_cliente"] = "Você faz em outras cores ou grava meu nome/gamertag na peça?"
+    if col_b4.button("🏋️ Aguenta quanto peso / é resistente?"):
+        st.session_state["duvida_cliente"] = "Esse suporte aguenta o peso sem quebrar com o tempo? O material é firme?"
+
+    duvida_input = st.text_area(
+        "Digite ou cole aqui a dúvida que o cliente perguntou no anúncio:",
+        value=st.session_state.get("duvida_cliente", "Serve no controle com capa de silicone ou fica apertado?"),
+        height=90,
+        key="duvida_text_area"
+    )
+
+    btn_responder = st.button("⚡ Gerar Resposta Persuasiva com IA", type="primary", use_container_width=True)
+
+    if btn_responder and duvida_input:
+        with st.spinner("🤖 Agente analisando a dúvida e redigindo a melhor resposta de conversão..."):
+            resposta_ia = responder_duvida_cliente(
+                pergunta_cliente=duvida_input,
+                nome_produto=prod_atendimento,
+                detalhes_produto=detalhes_custom
+            )
+
+        if resposta_ia:
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown(f"""
+            <div class="kpi-card" style="border-left: 4px solid #10B981;">
+                <div style="font-weight: 700; color: #10B981; font-size: 1.1rem; margin-bottom: 8px;">
+                    ✨ Resposta Pronta para Copiar e Colar
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            st.text_area("Selecione e copie o texto abaixo:", value=resposta_ia, height=350, key="resposta_box")
+
+
+# ===========================================================================
+# ABA 4: HISTÓRICO DE PESQUISAS & PLANILHAS
 # ===========================================================================
 with tab_historico:
+
     st.markdown("#### 📁 Central de Planilhas e Concorrentes")
     st.caption("Acesse os dados brutos minerados pelo robô para abrir no Excel ou cruzar dados.")
 
